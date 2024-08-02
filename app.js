@@ -3,7 +3,7 @@ import mysql from "mysql";
 import axios from "axios";
 import nodemailer from "nodemailer";
 import cors from "cors";
-require('dotenv').config();
+
 
 const app = express();
 
@@ -12,10 +12,10 @@ app.use(express.json());
 app.use(cors());
 
 export const db = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
+  host: "blwywub15bfp5arupuyk-mysql.services.clever-cloud.com",
+  user: "uogd3afs6xpzttln",
+  password: "EomwVgyTyhVotBUQ8TFy",
+  database: "blwywub15bfp5arupuyk",
 });
 
 db.connect((err) => {
@@ -40,7 +40,7 @@ app.get('/getWeatherInfo', async (req, res) => {
     try {
         const response = await axios.get(`http://api.weatherapi.com/v1/forecast.json`, {
             params: {
-                key: process.env.API_KEY,
+                key: 'c51aaf3dcc494cc8865115316242607',
                 q: q,
                 days: 5
             }
@@ -148,13 +148,13 @@ const sendmail = async (subject, content, recipient, type = 0) => {
         host: "smtp.gmail.com",
         service: 'Gmail',
         auth: {
-            user: process.env.MAIL_USER,
-            pass: process.env.MAIL_PASS
+            user: 'taitran3006@gmail.com',
+            pass: 'rpspaukfdyftvnyc'
         }
     });
 
     let mailOptions = {
-        from: process.env.MAIL_USER,
+        from: 'taitran3006@gmail.com',
         to: recipient,
         subject: subject,
         [type === 1 ? 'html' : 'text']: content
@@ -174,7 +174,7 @@ const sendWheatherInfo = async (location, mail) => {
     try {
         const response = await axios.get(`http://api.weatherapi.com/v1/forecast.json`, {
             params: {
-                key: process.env.API_KEY,
+                key: 'c51aaf3dcc494cc8865115316242607',
                 q: location,
                 days: 5
             }
