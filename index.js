@@ -1,8 +1,8 @@
-import express from "express";
-import mysql from "mysql";
-import axios from "axios";
-import nodemailer from "nodemailer";
-import cors from "cors";
+const express = require('express');
+const mysql = require('mysql');
+const axios = require('axios');
+const nodemailer = require('nodemailer');
+const cors = require('cors');
 
 
 const app = express();
@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(express.static('public'))
 app.use(cors());
 
-export const db = mysql.createConnection({
+const db = mysql.createConnection({
   host: "blwywub15bfp5arupuyk-mysql.services.clever-cloud.com",
   user: "uogd3afs6xpzttln",
   password: "EomwVgyTyhVotBUQ8TFy",
