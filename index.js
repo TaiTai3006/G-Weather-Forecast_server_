@@ -57,7 +57,7 @@ app.get('/getLocationByIP', async (req, res) => {
         const cityResponse = await axios.get('https://api.db-ip.com/v2/free/self');
         const cityname = cityResponse.data.city;
         const location = await getLocationByCityName(cityname);
-        res.json({ location });
+        res.json( location );
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
