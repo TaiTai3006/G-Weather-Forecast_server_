@@ -9,6 +9,7 @@ const app = express();
 
 
 app.use(express.json());
+app.use(express.static('public'))
 app.use(cors());
 
 export const db = mysql.createConnection({
