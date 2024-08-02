@@ -54,14 +54,20 @@ app.get('/getWeatherInfo', async (req, res) => {
 
 app.get('/getLocationByIP', async (req, res) => {
     try {
-        const cityResponse = await axios.get('https://api.db-ip.com/v2/free/self');
-        const cityname = cityResponse.data.city;
-        const location = await getLocationByCityName(cityname);
-        res.json( location );
+      const cityResponse = await axios.get('https://api.db-ip.com/v2/free/self');
+      const cityname = cityResponse.data.city;
+  
+      if (!cityname) {
+        return res.status(400).json({ error: 'City name not found in the response' });
+      }
+  
+      const location = await getLocationByCityName(cityname);
+      res.json(location);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+      console.error('Error fetching location:', error.response ? error.response.data : error.message);
+      res.status(500).json({ error: error.message });
     }
-});
+  });
 
 const getLocationByCityName = async (name) => {
     try {
