@@ -3,7 +3,7 @@ const mysql = require('mysql');
 const axios = require('axios');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
-
+require('dotenv').config()
 
 const app = express();
 
@@ -13,10 +13,10 @@ app.use(express.static('public'))
 app.use(cors());
 
 const db = mysql.createConnection({
-  host: "blwywub15bfp5arupuyk-mysql.services.clever-cloud.com",
-  user: "uogd3afs6xpzttln",
-  password: "EomwVgyTyhVotBUQ8TFy",
-  database: "blwywub15bfp5arupuyk",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
 });
 
 db.connect((err) => {
@@ -41,7 +41,7 @@ app.get('/getWeatherInfo', async (req, res) => {
     try {
         const response = await axios.get(`http://api.weatherapi.com/v1/forecast.json`, {
             params: {
-                key: 'c51aaf3dcc494cc8865115316242607',
+                key: process.env.API_KEY,
                 q: q,
                 days: 5
             }
@@ -66,7 +66,7 @@ app.get('/getLocationByIP', async (req, res) => {
 const getLocationByCityName = async (name) => {
     try {
         const url = `https://api.api-ninjas.com/v1/geocoding?city=${name}`;
-        const headers = { 'X-Api-Key': 'sycEOmug3GpUajiEHTFeUw==pSeXtHtQGiOYhBHS' };
+        const headers = { 'X-Api-Key':  "sycEOmug3GpUajiEHTFeUw==pSeXtHtQGiOYhBHS" };
 
         const response = await axios.get(url, { headers });
         const data = response.data;
@@ -149,13 +149,13 @@ const sendmail = async (subject, content, recipient, type = 0) => {
         host: "smtp.gmail.com",
         service: 'Gmail',
         auth: {
-            user: 'taitran3006@gmail.com',
-            pass: 'rpspaukfdyftvnyc'
+            user: process.env.MAIL_USER,
+            pass: process.env.MAIL_PASS
         }
     });
 
     let mailOptions = {
-        from: 'taitran3006@gmail.com',
+        from: process.env.MAIL_USER,
         to: recipient,
         subject: subject,
         [type === 1 ? 'html' : 'text']: content
@@ -175,7 +175,7 @@ const sendWheatherInfo = async (location, mail) => {
     try {
         const response = await axios.get(`http://api.weatherapi.com/v1/forecast.json`, {
             params: {
-                key: 'c51aaf3dcc494cc8865115316242607',
+                key: process.env.API_KEY,
                 q: location,
                 days: 5
             }
@@ -227,26 +227,30 @@ const sendWheatherInfo = async (location, mail) => {
 
 app.post('/logout', async (req, res) => {
     const { gmail } = req.body;
-
-    try {
-        const q1 = "UPDATE `mail` SET `status`= 0 WHERE `gmail`= ?";
-                db.query(q1, [gmail], (err) => {
-                    if (err) return res.status(500).json({ error: err.message }); 
-
-                let mailInstance = { gmail, status: 0 };
-
   
-                sendmail('[Unsubscribe] G-Weather-Forecast thank you.', 
-                        'Thank you for your interest and following. See you again one day soon.', 
-                        gmail);
-        
-                res.status(201).json(mailInstance);});
-
-        
+    try {
+      const q1 = "UPDATE `mail` SET `status`= 0 WHERE `gmail`= ?";
+      db.query(q1, [gmail], async (err) => { 
+        if (err) return res.status(500).json({ error: err.message });
+  
+        let mailInstance = { gmail, status: 0 };
+  
+        try {
+          await sendmail(
+            '[Unsubscribe] G-Weather-Forecast thank you.',
+            'Thank you for your interest and following. See you again one day soon.',
+            gmail
+          );
+        } catch (emailError) {
+          return res.status(500).json({ error: emailError.message });
+        }
+  
+        res.status(201).json(mailInstance);
+      });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message });
     }
-});
+  });
 
 
 
